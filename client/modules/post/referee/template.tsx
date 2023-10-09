@@ -2,29 +2,22 @@
 
 import React from "react"
 
-import { ISearchPostResponse } from "@/types/api/response/referer-post"
-import { MessageType } from "@/types/common/message-type"
-import { ReferralType } from "@/types/common/referral-type"
-import useGetIndustryList from "@/hooks/api/industry/get-Industry-list"
-import useGetCityList from "@/hooks/api/location/get-city-list"
-import useGetCountryList from "@/hooks/api/location/get-country-list"
-import useGetProvinceList from "@/hooks/api/location/get-province-list"
+import {ISearchPostResponse} from "@/types/api/response/referer-post"
+import {MessageType} from "@/types/common/message-type"
+import {ReferralType} from "@/types/common/referral-type"
 import useSearchPost from "@/hooks/api/post/search-post"
-import { Input } from "@/components/ui/input"
+import {Input} from "@/components/ui/input"
 import BaseInfiniteScroll from "@/components/customized-ui/Infinite-scroll/base"
 import ReferralCard from "@/components/customized-ui/cards/referral"
 import SearchPopover from "@/components/customized-ui/pop-overs/search"
 import CardSkeletonList from "@/components/customized-ui/skeletons /card-list"
 
-interface IRefereePostPageProps {}
+interface IRefereePostPageProps {
+}
+
 const RefereePostPageTemplate: React.FunctionComponent<
   IRefereePostPageProps
 > = () => {
-  const { data: industryList } = useGetIndustryList()
-  const { data: cityList } = useGetCityList()
-  const { data: countryList } = useGetCountryList()
-  const { data: provinceList } = useGetProvinceList()
-
   const {
     result,
     handleCompanyChange,
@@ -44,7 +37,7 @@ const RefereePostPageTemplate: React.FunctionComponent<
     sorting,
   } = useSearchPost(ReferralType.REFEREE)
 
-  const { data, fetchNextPage, isLoading, isFetching } = result
+  const {data, fetchNextPage, isLoading, isFetching} = result
 
   const list = data
     ? (data?.pages.flatMap((d) => d) as ISearchPostResponse[])
@@ -52,13 +45,9 @@ const RefereePostPageTemplate: React.FunctionComponent<
 
   return (
     <>
-      <div className="flex flex-row mt-8 gap-4 w-full h-full">
-        <Input onChange={handleCompanyChange} placeholder="公司名稱" />
+      <div className="mt-8 flex h-full w-full flex-row gap-4">
+        <Input onChange={handleCompanyChange} placeholder="公司名稱"/>
         <SearchPopover
-          countryList={countryList}
-          provinceList={provinceList}
-          cityList={cityList}
-          industryList={industryList}
           provinceUuid={provinceUuid}
           countryUuid={countryUuid}
           onCityChange={handleCityChange}
@@ -80,12 +69,12 @@ const RefereePostPageTemplate: React.FunctionComponent<
       </div>
 
       {!isLoading && !isFetching && list.length === 0 && (
-        <div className="p-4 rounded-lg text-center mt-8 border-2">
+        <div className="mt-8 rounded-lg border-2 p-4 text-center">
           冇資料🥲不如開個Post先？？
         </div>
       )}
 
-      {isLoading && <CardSkeletonList />}
+      {isLoading && <CardSkeletonList/>}
 
       {!isLoading && list.length > 0 && (
         <BaseInfiniteScroll
@@ -98,7 +87,7 @@ const RefereePostPageTemplate: React.FunctionComponent<
             true
           }
         >
-          <div className="grid grid-cols-1 gap-4  w-full overflow-hidden mt-8">
+          <div className="mt-8 grid w-full  grid-cols-1 gap-4 overflow-hidden">
             {list.map((data) => {
               return (
                 <ReferralCard

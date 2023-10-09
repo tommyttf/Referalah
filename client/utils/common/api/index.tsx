@@ -1,19 +1,20 @@
-import { supabase } from "@/utils/services/supabase/config"
+import {supabase} from "@/utils/services/supabase/config"
 
-import { IContactThroughPostRequest } from "@/types/api/request/contact/post"
-import { IContactReferralRequest } from "@/types/api/request/contact/referral"
-import { ICreatePostRequest } from "@/types/api/request/post/create"
-import { IUpdateUserProfileRequest } from "@/types/api/request/user/update"
-import { ICityResponse } from "@/types/api/response/city"
-import { IIndustryResponse } from "@/types/api/response/industry"
-import { IUserResponse } from "@/types/api/response/user"
-import { ReferralType } from "@/types/common/referral-type"
+import {IContactThroughPostRequest} from "@/types/api/request/contact/post"
+import {IContactReferralRequest} from "@/types/api/request/contact/referral"
+import {ICreatePostRequest} from "@/types/api/request/post/create"
+import {IUpdateUserProfileRequest} from "@/types/api/request/user/update"
+import {IIndustryResponse} from "@/types/api/response/industry"
+import {IUserResponse} from "@/types/api/response/user"
+import {ReferralType} from "@/types/common/referral-type"
+import {ICountryResponse} from "@/types/api/response/country";
+import {ICityResponse} from "@/types/api/response/city"
 
 const apiService = {
   // User Profile
   getUserProfile: async (arg: any) => {
     try {
-      const { data, error } = await supabase
+      const {data, error} = await supabase
         .from("user")
         .select(
           `
@@ -59,7 +60,7 @@ const apiService = {
   },
   updateUserProfile: async (req: IUpdateUserProfileRequest) => {
     try {
-      const { data, error } = await supabase
+      const {data, error} = await supabase
         .from("user")
         .update({
           avatar_url: req.avatarUrl,
@@ -87,7 +88,7 @@ const apiService = {
       console.error(err)
     }
   },
-  searchReferral: async ({ pageParam = 0, queryKey }: any) => {
+  searchReferral: async ({pageParam = 0, queryKey}: any) => {
     try {
       const NUMBER_OF_DATE_PER_FETCH = 10
       const countryUuid = queryKey[1].filterMeta.countryUuid
@@ -135,8 +136,8 @@ const apiService = {
         )
         .lte("year_of_experience", yoeMax ? parseInt(yoeMax) : 100)
         .gte("year_of_experience", yoeMin ? parseInt(yoeMin) : 0)
-        .order("year_of_experience", { ascending: order })
-        .order("id", { ascending: true })
+        .order("year_of_experience", {ascending: order})
+        .order("id", {ascending: true})
         .range(from, to)
 
       if (type === ReferralType.REFERRER) {
@@ -164,7 +165,7 @@ const apiService = {
         query = query.ilike("company_name", `%${companyName}%`)
       }
 
-      const { data, error } = await query
+      const {data, error} = await query
 
       if (error) throw error
 
@@ -194,7 +195,7 @@ const apiService = {
       console.error(err)
     }
   },
-  searchPost: async ({ pageParam = 0, queryKey }: any) => {
+  searchPost: async ({pageParam = 0, queryKey}: any) => {
     try {
       const NUMBER_OF_DATE_PER_FETCH = 3
       const type = queryKey[1].type as ReferralType
@@ -246,11 +247,11 @@ const apiService = {
         .range(from, to)
 
       if (sortingType === "createdAt") {
-        query = query.order("created_at", { ascending: order })
+        query = query.order("created_at", {ascending: order})
       }
 
       if (sortingType === "yoe") {
-        query = query.order("year_of_experience", { ascending: order })
+        query = query.order("year_of_experience", {ascending: order})
       }
       if (countryUuid !== undefined) {
         query = query.eq("country_uuid", countryUuid)
@@ -264,7 +265,7 @@ const apiService = {
       if (industryUuid !== undefined) {
         query = query.eq("industry_uuid", industryUuid)
       }
-      const { data, error } = await query.order("id", { ascending: true })
+      const {data, error} = await query.order("id", {ascending: true})
 
       if (error) throw error
 
@@ -277,7 +278,7 @@ const apiService = {
   // Industry
   getIndustryList: async () => {
     try {
-      const { data: industryData, error: industryError } = await supabase
+      const {data: industryData, error: industryError} = await supabase
         .from("industry")
         .select("*")
 
@@ -293,7 +294,7 @@ const apiService = {
   // Country
   getCountryList: async () => {
     try {
-      const { data: countryData, error: countryError } = await supabase
+      const {data: countryData, error: countryError} = await supabase
         .from("country")
         .select("*")
 
@@ -301,7 +302,7 @@ const apiService = {
         throw countryError
       }
 
-      return countryData as ICityResponse[]
+      return countryData as ICountryResponse[]
     } catch (error) {
       console.error(error)
     }
@@ -310,7 +311,7 @@ const apiService = {
   // Province
   getProvinceList: async () => {
     try {
-      const { data: provinceData, error: provinceError } = await supabase
+      const {data: provinceData, error: provinceError} = await supabase
         .from("province")
         .select("*")
 
@@ -326,18 +327,18 @@ const apiService = {
 
   // City
   getCityList: async () => {
-    const { data, error } = await supabase.from("city").select("*")
+    const {data, error} = await supabase.from("city").select("*")
 
     if (error) {
       throw error
     }
 
-    return data
+    return data as ICityResponse[]
   },
   // Contact
   contactReferral: async (req: IContactReferralRequest) => {
     try {
-      const { data, error } = await supabase.functions.invoke(
+      const {data, error} = await supabase.functions.invoke(
         "contact-referral",
         {
           body: {
@@ -357,7 +358,7 @@ const apiService = {
   },
   contactThroughPost: async (req: IContactThroughPostRequest) => {
     try {
-      const { data, error } = await supabase.functions.invoke(
+      const {data, error} = await supabase.functions.invoke(
         "contact-through-post",
         {
           body: {
@@ -378,9 +379,9 @@ const apiService = {
   // Statistic
   getUserCount: async () => {
     try {
-      const { count, error } = await supabase
+      const {count, error} = await supabase
         .from("user")
-        .select("id", { count: "exact" })
+        .select("id", {count: "exact"})
 
       if (error) throw error
       return count

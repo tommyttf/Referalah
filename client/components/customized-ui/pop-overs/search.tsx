@@ -1,32 +1,20 @@
-import React, { ChangeEvent } from "react"
+import React, {ChangeEvent} from "react"
 import BaseSelect from "@/components/customized-ui/selects/base"
-import { Icons } from "@/components/icons"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
+import {Icons} from "@/components/icons"
+import {Button} from "@/components/ui/button"
+import {Input} from "@/components/ui/input"
+import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover"
 import useCityOptions from "@/hooks/common/options/city-options"
 import useCountryOptions from "@/hooks/common/options/country-options"
 import useIndustryOptions from "@/hooks/common/options/industry-options"
 import useProvinceOptions from "@/hooks/common/options/province-pptions"
-import { postSortingOptions } from "@/utils/common/sorting/post"
-import { referralSortingOptions } from "@/utils/common/sorting/referer"
-import { Label } from "@radix-ui/react-label"
+import {postSortingOptions} from "@/utils/common/sorting/post"
+import {referralSortingOptions} from "@/utils/common/sorting/referer"
+import {Label} from "@radix-ui/react-label"
 
-import { ICityResponse } from "@/types/api/response/city"
-import { ICountryResponse } from "@/types/api/response/country"
-import { IIndustryResponse } from "@/types/api/response/industry"
-import { IProvinceResponse } from "@/types/api/response/province"
-import { MessageType } from "@/types/common/message-type"
+import {MessageType} from "@/types/common/message-type"
 
 interface ISearchPopoverProps {
-  countryList?: ICountryResponse[]
-  provinceList?: IProvinceResponse[]
-  cityList?: ICityResponse[]
-  industryList?: IIndustryResponse[]
   countryUuid?: string
   provinceUuid?: string
   onCountryChange: (value: string) => void
@@ -45,39 +33,38 @@ interface ISearchPopoverProps {
   currentSorting: string
   type: MessageType
 }
-const SearchPopover: React.FunctionComponent<ISearchPopoverProps> = ({
-  countryList,
-  provinceList,
-  cityList,
-  industryList,
-  provinceUuid,
-  countryUuid,
-  onCityChange,
-  onCountryChange,
-  onProvinceChange,
-  onIndustryChange,
-  onSortingChange,
-  onYeoMinChange,
-  onYeoMaxChange,
-  currentCountryUuid,
-  currentProvinceUuid,
-  currentCityUuid,
-  currentIndustryUuid,
-  currentYeoMin,
-  currentYeoMax,
-  currentSorting,
-  type,
-}) => {
-  const industryOptions = useIndustryOptions(industryList)
-  const countryOptions = useCountryOptions(countryList)
-  const provinceOptions = useProvinceOptions(provinceList, countryUuid)
-  const cityOptions = useCityOptions(cityList, provinceUuid)
+
+const SearchPopover: React.FunctionComponent<ISearchPopoverProps> = (
+  {
+    provinceUuid,
+    countryUuid,
+    onCityChange,
+    onCountryChange,
+    onProvinceChange,
+    onIndustryChange,
+    onSortingChange,
+    onYeoMinChange,
+    onYeoMaxChange,
+    currentCountryUuid,
+    currentProvinceUuid,
+    currentCityUuid,
+    currentIndustryUuid,
+    currentYeoMin,
+    currentYeoMax,
+    currentSorting,
+    type,
+  }
+) => {
+  const industryOptions = useIndustryOptions()
+  const countryOptions = useCountryOptions()
+  const provinceOptions = useProvinceOptions(countryUuid)
+  const cityOptions = useCityOptions(provinceUuid)
 
   return (
     <Popover>
       <PopoverTrigger asChild>
         <Button variant="outline">
-          <Icons.slidersHorizontal />
+          <Icons.slidersHorizontal/>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80">

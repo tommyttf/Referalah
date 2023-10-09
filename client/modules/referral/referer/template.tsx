@@ -3,10 +3,6 @@ import React from "react"
 import { IReferralResponse } from "@/types/api/response/referral"
 import { MessageType } from "@/types/common/message-type"
 import { ReferralType } from "@/types/common/referral-type"
-import useGetIndustryList from "@/hooks/api/industry/get-Industry-list"
-import useGetCityList from "@/hooks/api/location/get-city-list"
-import useGetCountryList from "@/hooks/api/location/get-country-list"
-import useGetProvinceList from "@/hooks/api/location/get-province-list"
 import useSearchReferral from "@/hooks/api/referral/search-referral"
 import { Input } from "@/components/ui/input"
 import BaseInfiniteScroll from "@/components/customized-ui/Infinite-scroll/base"
@@ -18,11 +14,6 @@ interface IRefererPageTemplateProps {}
 const RefererPageTemplate: React.FunctionComponent<
   IRefererPageTemplateProps
 > = () => {
-  const { data: industryList } = useGetIndustryList()
-  const { data: cityList } = useGetCityList()
-  const { data: countryList } = useGetCountryList()
-  const { data: provinceList } = useGetProvinceList()
-
   const {
     result,
     handleCompanyChange,
@@ -58,10 +49,6 @@ const RefererPageTemplate: React.FunctionComponent<
       <div className="flex flex-row mt-8 gap-4 w-full h-full">
         <Input onChange={handleCompanyChange} placeholder="公司名稱" />
         <SearchPopover
-          countryList={countryList}
-          provinceList={provinceList}
-          cityList={cityList}
-          industryList={industryList}
           provinceUuid={provinceUuid}
           countryUuid={countryUuid}
           onCityChange={handleCityChange}

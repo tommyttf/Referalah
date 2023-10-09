@@ -1,31 +1,27 @@
 "use client"
 
-import React, { useEffect, useMemo, useState } from "react"
-import { StaticImport } from "next/dist/shared/lib/get-img-props"
-import { useRouter } from "next/navigation"
-import { conditionalValidation } from "@/modules/profile/form/validation.ts/conditional"
-import { maximumWordValidation } from "@/modules/profile/form/validation.ts/max-word"
-import { nameValidation } from "@/modules/profile/form/validation.ts/name"
-import { supabase } from "@/utils/services/supabase/config"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { v4 as uuidv4 } from "uuid"
-import { z } from "zod"
+import React, {useEffect, useMemo, useState} from "react"
+import {StaticImport} from "next/dist/shared/lib/get-img-props"
+import {useRouter} from "next/navigation"
+import {conditionalValidation} from "@/modules/profile/form/validation.ts/conditional"
+import {maximumWordValidation} from "@/modules/profile/form/validation.ts/max-word"
+import {nameValidation} from "@/modules/profile/form/validation.ts/name"
+import {supabase} from "@/utils/services/supabase/config"
+import {zodResolver} from "@hookform/resolvers/zod"
+import {useForm} from "react-hook-form"
+import {v4 as uuidv4} from "uuid"
+import {z} from "zod"
 
-import { IUpdateUserProfileRequest } from "@/types/api/request/user/update"
-import useGetIndustryList from "@/hooks/api/industry/get-Industry-list"
-import useGetCityList from "@/hooks/api/location/get-city-list"
-import useGetCountryList from "@/hooks/api/location/get-country-list"
-import useGetProvinceList from "@/hooks/api/location/get-province-list"
+import {IUpdateUserProfileRequest} from "@/types/api/request/user/update"
 import useUpdateUserProfile from "@/hooks/api/user/update-user-profile"
 import useCityOptions from "@/hooks/common/options/city-options"
 import useCountryOptions from "@/hooks/common/options/country-options"
 import useIndustryOptions from "@/hooks/common/options/industry-options"
 import useProvinceOptions from "@/hooks/common/options/province-pptions"
 import useUserStore from "@/hooks/state/user/store"
-import { Button } from "@/components/ui/button"
-import { Form } from "@/components/ui/form"
-import { useToast } from "@/components/ui/use-toast"
+import {Button} from "@/components/ui/button"
+import {Form} from "@/components/ui/form"
+import {useToast} from "@/components/ui/use-toast"
 import BaseAvatar from "@/components/customized-ui/avatars/base"
 import FormCheckBox from "@/components/customized-ui/form/check-box"
 import FormFileUpload from "@/components/customized-ui/form/file"
@@ -33,7 +29,7 @@ import FormTextInput from "@/components/customized-ui/form/input"
 import FormNumberInput from "@/components/customized-ui/form/number"
 import FormSelect from "@/components/customized-ui/form/select"
 import FormTextArea from "@/components/customized-ui/form/text-area"
-import { Icons } from "@/components/icons"
+import {Icons} from "@/components/icons"
 
 interface IEdiProfileTemplate {
   isProfileLoading: boolean
@@ -54,23 +50,24 @@ interface IEdiProfileTemplate {
   setIsEditMode: (value: boolean) => void
 }
 
-const EditProfileTemplate: React.FunctionComponent<IEdiProfileTemplate> = ({
-  photoUrl,
-  username,
-  description,
-  company,
-  jobTitle,
-  yearOfExperience,
-  countryUuid,
-  provinceUuid,
-  cityUuid,
-  industryUuid,
-  socialMediaUrl,
-  isReferer,
-  isReferee,
-  isProfileLoading,
-  setIsEditMode,
-}) => {
+const EditProfileTemplate: React.FunctionComponent<IEdiProfileTemplate> = (
+  {
+    photoUrl,
+    username,
+    description,
+    company,
+    jobTitle,
+    yearOfExperience,
+    countryUuid,
+    provinceUuid,
+    cityUuid,
+    industryUuid,
+    socialMediaUrl,
+    isReferer,
+    isReferee,
+    isProfileLoading,
+    setIsEditMode,
+  }) => {
   const formSchema = z
     .object({
       photoUrl: z.any().optional(),
@@ -152,14 +149,14 @@ const EditProfileTemplate: React.FunctionComponent<IEdiProfileTemplate> = ({
     )
 
   const router = useRouter()
-  const { toast } = useToast()
+  const {toast} = useToast()
   const [image, setImage] = useState<any | null>(null)
   const [base64Image, setBase64Image] = useState<string | StaticImport | null>(
     null
   )
   const [isSubmitting, setIsSubmitting] = useState(false)
   const user = useUserStore((state) => state)
-  const { mutate: updateProfile, error: updateProfileError } =
+  const {mutate: updateProfile, error: updateProfileError} =
     useUpdateUserProfile()
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -187,21 +184,16 @@ const EditProfileTemplate: React.FunctionComponent<IEdiProfileTemplate> = ({
     }, [isProfileLoading]),
   })
 
-  const { watch, setValue } = form
+  const {watch, setValue} = form
 
   const countryWatch = watch("countryUuid")
   const provinceWatch = watch("provinceUuid")
   const yeoWatch = watch("yearOfExperience")
 
-  const { data: industryList } = useGetIndustryList()
-  const { data: countryList } = useGetCountryList()
-  const { data: provinceList } = useGetProvinceList()
-  const { data: cityList } = useGetCityList()
-
-  const industryOptions = useIndustryOptions(industryList)
-  const countryOptions = useCountryOptions(countryList)
-  const provinceOptions = useProvinceOptions(provinceList, countryWatch)
-  const cityOptions = useCityOptions(cityList, provinceWatch)
+  const industryOptions = useIndustryOptions()
+  const countryOptions = useCountryOptions()
+  const provinceOptions = useProvinceOptions(countryWatch)
+  const cityOptions = useCityOptions(provinceWatch)
 
   useEffect(() => {
     if (provinceWatch !== provinceUuid) {
@@ -237,7 +229,7 @@ const EditProfileTemplate: React.FunctionComponent<IEdiProfileTemplate> = ({
       let photoUrl = values.photoUrl
 
       if (image) {
-        const { data: list, error: listError } = await supabase.storage
+        const {data: list, error: listError} = await supabase.storage
           .from("user_assets")
           .list(`${user.uuid}/avatar_image`)
 
@@ -246,13 +238,13 @@ const EditProfileTemplate: React.FunctionComponent<IEdiProfileTemplate> = ({
             (x) => `${user.uuid}/avatar_image/${x.name}`
           )
 
-          const { error: removeError } = await supabase.storage
+          const {error: removeError} = await supabase.storage
             .from("user_assets")
             .remove(filesToRemove)
         }
 
         const uuid = uuidv4()
-        const { data, error } = await supabase.storage
+        const {data, error} = await supabase.storage
           .from("user_assets")
           .upload(`${user.uuid}/avatar_image/${uuid}_${image.name}`, image)
 
@@ -262,7 +254,7 @@ const EditProfileTemplate: React.FunctionComponent<IEdiProfileTemplate> = ({
             description: "好似有啲錯誤，如果試多幾次都係咁，請聯絡我🙏🏻",
           })
         }
-        const { data: imageUrl } = await supabase.storage
+        const {data: imageUrl} = await supabase.storage
           .from("user_assets")
           .getPublicUrl(`${user.uuid}/avatar_image/${uuid}_${image.name}`)
 
@@ -329,7 +321,7 @@ const EditProfileTemplate: React.FunctionComponent<IEdiProfileTemplate> = ({
   }
 
   return (
-    <div className="w-full h-full flex flex-col mt-28 p-4">
+    <div className="mt-28 flex h-full w-full flex-col p-4">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -343,7 +335,7 @@ const EditProfileTemplate: React.FunctionComponent<IEdiProfileTemplate> = ({
               variant={"ghost"}
               className=" gap-2"
             >
-              <Icons.undo />
+              <Icons.undo/>
               返回
             </Button>
           </div>
@@ -375,7 +367,7 @@ const EditProfileTemplate: React.FunctionComponent<IEdiProfileTemplate> = ({
             description="食到JPG，JPEG，PNG，最多1MB。"
           />
 
-          <div className="flex   flex-col sm:flex-row gap-4 w-full justify-center items-center mt-4">
+          <div className="mt-4   flex w-full flex-col items-center justify-center gap-4 sm:flex-row">
             <div className="w-full">
               <FormCheckBox
                 control={form.control}
