@@ -1,20 +1,27 @@
-import {supabase} from "@/utils/services/supabase/config"
+import { supabase } from "@/utils/services/supabase/config"
+import { QueryFunction } from "@tanstack/query-core/src/types"
 
-import {IContactThroughPostRequest} from "@/types/api/request/contact/post"
-import {IContactReferralRequest} from "@/types/api/request/contact/referral"
-import {ICreatePostRequest} from "@/types/api/request/post/create"
-import {IUpdateUserProfileRequest} from "@/types/api/request/user/update"
-import {IIndustryResponse} from "@/types/api/response/industry"
-import {IUserResponse} from "@/types/api/response/user"
-import {ReferralType} from "@/types/common/referral-type"
-import {ICountryResponse} from "@/types/api/response/country";
-import {ICityResponse} from "@/types/api/response/city"
+import { IContactThroughPostRequest } from "@/types/api/request/contact/post"
+import { IContactReferralRequest } from "@/types/api/request/contact/referral"
+import {
+  ICreatePostRequest,
+  IFilterMeta,
+} from "@/types/api/request/post/create"
+import { IUpdateUserProfileRequest } from "@/types/api/request/user/update"
+import { ICityResponse } from "@/types/api/response/city"
+import { ICountryResponse } from "@/types/api/response/country"
+import { IIndustryResponse } from "@/types/api/response/industry"
+import { ISearchPostResponse } from "@/types/api/response/referer-post"
+import { IUserResponse } from "@/types/api/response/user"
+import { QueryKeyString } from "@/types/common/query-key-string"
+import { ReferralType } from "@/types/common/referral-type"
 
+// TODO: add all types, or not to use a 'service' to wrap all the api call
 const apiService = {
   // User Profile
   getUserProfile: async (arg: any) => {
     try {
-      const {data, error} = await supabase
+      const { data, error } = await supabase
         .from("user")
         .select(
           `
@@ -60,7 +67,7 @@ const apiService = {
   },
   updateUserProfile: async (req: IUpdateUserProfileRequest) => {
     try {
-      const {data, error} = await supabase
+      const { data, error } = await supabase
         .from("user")
         .update({
           avatar_url: req.avatarUrl,
@@ -88,7 +95,7 @@ const apiService = {
       console.error(err)
     }
   },
-  searchReferral: async ({pageParam = 0, queryKey}: any) => {
+  searchReferral: async ({ pageParam = 0, queryKey }: any) => {
     try {
       const NUMBER_OF_DATE_PER_FETCH = 10
       const countryUuid = queryKey[1].filterMeta.countryUuid
@@ -101,7 +108,7 @@ const apiService = {
       const type = queryKey[1].type satisfies ReferralType
 
       const sort = queryKey[1].sorting.split(",")
-      const order = sort[1] === "dec" ? false : true
+      const order = sort[1] !== "dec"
       const from = pageParam * NUMBER_OF_DATE_PER_FETCH
       const to = from + NUMBER_OF_DATE_PER_FETCH
 
@@ -136,8 +143,8 @@ const apiService = {
         )
         .lte("year_of_experience", yoeMax ? parseInt(yoeMax) : 100)
         .gte("year_of_experience", yoeMin ? parseInt(yoeMin) : 0)
-        .order("year_of_experience", {ascending: order})
-        .order("id", {ascending: true})
+        .order("year_of_experience", { ascending: order })
+        .order("id", { ascending: true })
         .range(from, to)
 
       if (type === ReferralType.REFERRER) {
@@ -165,7 +172,7 @@ const apiService = {
         query = query.ilike("company_name", `%${companyName}%`)
       }
 
-      const {data, error} = await query
+      const { data, error } = await query
 
       if (error) throw error
 
@@ -195,25 +202,154 @@ const apiService = {
       console.error(err)
     }
   },
-  searchPost: async ({pageParam = 0, queryKey}: any) => {
-    try {
-      const NUMBER_OF_DATE_PER_FETCH = 3
-      const type = queryKey[1].type as ReferralType
-      const countryUuid = queryKey[1].filterMeta.countryUuid
-      const provinceUuid = queryKey[1].filterMeta.provinceUuid
-      const cityUuid = queryKey[1].filterMeta.cityUuid
-      const industryUuid = queryKey[1].filterMeta.industryUuid
-      const companyName = queryKey[1].filterMeta.companyName
-      const sort = queryKey[1].sorting.split(",")
-      const sortingType = sort[0]
-      const order = sort[1] === "dec" ? false : true
-      const from = pageParam * NUMBER_OF_DATE_PER_FETCH
-      const to = from + NUMBER_OF_DATE_PER_FETCH - 1
 
-      let query = supabase
-        .from("post")
-        .select(
-          `   uuid,
+  // Industry
+  getIndustryList: async () => {
+    try {
+      const { data: industryData, error: industryError } = await supabase
+        .from("industry")
+        .select("*")
+
+      if (industryError) {
+        throw industryError
+      }
+      return industryData as IIndustryResponse[]
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  // Country
+  getCountryList: async () => {
+    try {
+      const { data: countryData, error: countryError } = await supabase
+        .from("country")
+        .select("*")
+
+      if (countryError) {
+        throw countryError
+      }
+
+      return countryData as ICountryResponse[]
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  // Province
+  getProvinceList: async () => {
+    try {
+      const { data: provinceData, error: provinceError } = await supabase
+        .from("province")
+        .select("*")
+
+      if (provinceError) {
+        throw provinceError
+      }
+
+      return provinceData
+    } catch (err) {
+      console.error(err)
+    }
+  },
+
+  // City
+  getCityList: async () => {
+    const { data, error } = await supabase
+      .from("city")
+      .select<"*", ICityResponse>("*")
+
+    if (error) {
+      throw error
+    }
+
+    return data
+  },
+  // Contact
+  contactReferral: async (req: IContactReferralRequest) => {
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "contact-referral",
+        {
+          body: {
+            type: req.type,
+            message: req.message,
+            to_uuid: req.toUuid,
+          },
+        }
+      )
+
+      if (error) {
+        throw error
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  },
+  contactThroughPost: async (req: IContactThroughPostRequest) => {
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "contact-through-post",
+        {
+          body: {
+            message: req.message,
+            post_uuid: req.postUuid,
+          },
+        }
+      )
+
+      if (error) {
+        throw error
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  },
+
+  // Statistic
+  getUserCount: async () => {
+    try {
+      const { count, error } = await supabase
+        .from("user")
+        .select("id", { count: "exact" })
+
+      if (error) throw error
+      return count
+    } catch (err) {
+      console.error(err)
+    }
+  },
+}
+
+export const searchPost: QueryFunction<
+  ISearchPostResponse[],
+  [
+    QueryKeyString,
+    {
+      sorting: string
+      filterMeta: IFilterMeta
+      type: ReferralType
+    }
+  ]
+> = async ({ pageParam = 0, queryKey }) => {
+  try {
+    const NUMBER_OF_DATE_PER_FETCH = 3
+    const type = queryKey[1].type
+    const countryUuid = queryKey[1].filterMeta.countryUuid
+    const provinceUuid = queryKey[1].filterMeta.provinceUuid
+    const cityUuid = queryKey[1].filterMeta.cityUuid
+    const industryUuid = queryKey[1].filterMeta.industryUuid
+    const companyName = queryKey[1].filterMeta.companyName
+    const sort = queryKey[1].sorting.split(",")
+    const sortingType = sort[0]
+    const order = sort[1] !== "dec"
+    const from = pageParam * NUMBER_OF_DATE_PER_FETCH
+    const to = from + NUMBER_OF_DATE_PER_FETCH - 1
+
+    let query = supabase
+      .from("post")
+      .select<string, ISearchPostResponse>(
+        `   uuid,
               created_at,
               url,
               description,
@@ -237,158 +373,44 @@ const apiService = {
                   avatar_url
               )
             `
-        )
-        .eq("type", type)
-        .eq("status", "active")
-        .ilike("company_name", `%${companyName}%`)
-        .lte("year_of_experience", 100)
-        .gte("year_of_experience", 0)
-
-        .range(from, to)
-
-      if (sortingType === "createdAt") {
-        query = query.order("created_at", {ascending: order})
-      }
-
-      if (sortingType === "yoe") {
-        query = query.order("year_of_experience", {ascending: order})
-      }
-      if (countryUuid !== undefined) {
-        query = query.eq("country_uuid", countryUuid)
-      }
-      if (provinceUuid !== undefined) {
-        query = query.eq("province_uuid", provinceUuid)
-      }
-      if (cityUuid !== undefined) {
-        query = query.eq("city_uuid", cityUuid)
-      }
-      if (industryUuid !== undefined) {
-        query = query.eq("industry_uuid", industryUuid)
-      }
-      const {data, error} = await query.order("id", {ascending: true})
-
-      if (error) throw error
-
-      return data
-    } catch (err) {
-      console.error(err)
-    }
-  },
-
-  // Industry
-  getIndustryList: async () => {
-    try {
-      const {data: industryData, error: industryError} = await supabase
-        .from("industry")
-        .select("*")
-
-      if (industryError) {
-        throw industryError
-      }
-      return industryData as IIndustryResponse[]
-    } catch (error) {
-      console.error(error)
-    }
-  },
-
-  // Country
-  getCountryList: async () => {
-    try {
-      const {data: countryData, error: countryError} = await supabase
-        .from("country")
-        .select("*")
-
-      if (countryError) {
-        throw countryError
-      }
-
-      return countryData as ICountryResponse[]
-    } catch (error) {
-      console.error(error)
-    }
-  },
-
-  // Province
-  getProvinceList: async () => {
-    try {
-      const {data: provinceData, error: provinceError} = await supabase
-        .from("province")
-        .select("*")
-
-      if (provinceError) {
-        throw provinceError
-      }
-
-      return provinceData
-    } catch (err) {
-      console.error(err)
-    }
-  },
-
-  // City
-  getCityList: async () => {
-    const {data, error} = await supabase.from("city").select("*")
-
-    if (error) {
-      throw error
-    }
-
-    return data as ICityResponse[]
-  },
-  // Contact
-  contactReferral: async (req: IContactReferralRequest) => {
-    try {
-      const {data, error} = await supabase.functions.invoke(
-        "contact-referral",
-        {
-          body: {
-            type: req.type,
-            message: req.message,
-            to_uuid: req.toUuid,
-          },
-        }
       )
+      .eq("type", type)
+      .eq("status", "active")
+      .ilike("company_name", `%${companyName}%`)
+      .lte("year_of_experience", 100)
+      .gte("year_of_experience", 0)
 
-      if (error) {
-        throw error
-      }
-    } catch (err) {
-      console.error(err)
+      .range(from, to)
+
+    if (sortingType === "createdAt") {
+      query = query.order("created_at", { ascending: order })
     }
-  },
-  contactThroughPost: async (req: IContactThroughPostRequest) => {
-    try {
-      const {data, error} = await supabase.functions.invoke(
-        "contact-through-post",
-        {
-          body: {
-            message: req.message,
-            post_uuid: req.postUuid,
-          },
-        }
-      )
 
-      if (error) {
-        throw error
-      }
-    } catch (err) {
-      console.error(err)
+    if (sortingType === "yoe") {
+      query = query.order("year_of_experience", { ascending: order })
     }
-  },
-
-  // Statistic
-  getUserCount: async () => {
-    try {
-      const {count, error} = await supabase
-        .from("user")
-        .select("id", {count: "exact"})
-
-      if (error) throw error
-      return count
-    } catch (err) {
-      console.error(err)
+    if (countryUuid !== undefined) {
+      query = query.eq("country_uuid", countryUuid)
     }
-  },
+    if (provinceUuid !== undefined) {
+      query = query.eq("province_uuid", provinceUuid)
+    }
+    if (cityUuid !== undefined) {
+      query = query.eq("city_uuid", cityUuid)
+    }
+    if (industryUuid !== undefined) {
+      query = query.eq("industry_uuid", industryUuid)
+    }
+    const { data, error } = await query.order("id", { ascending: true })
+
+    if (error) throw error
+    if (data === null) return []
+
+    return data
+  } catch (err) {
+    console.error(err)
+    return []
+  }
 }
 
 export default apiService

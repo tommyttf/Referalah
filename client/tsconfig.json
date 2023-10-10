@@ -1,6 +1,11 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "target": "es6",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -15,7 +20,9 @@
     "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": [
+        "./*"
+      ]
     },
     "plugins": [
       {
@@ -26,6 +33,7 @@
   },
   "include": [
     "next-env.d.ts",
+    "env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
@@ -35,5 +43,7 @@
     "supabase/functions/_shared/cors.ts",
     "supabase/functions/_shared/client.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

@@ -2,7 +2,6 @@
 
 import React from "react"
 
-import { ISearchPostResponse } from "@/types/api/response/referer-post"
 import { MessageType } from "@/types/common/message-type"
 import { ReferralType } from "@/types/common/referral-type"
 import useSearchPost from "@/hooks/api/post/search-post"
@@ -13,6 +12,7 @@ import SearchPopover from "@/components/customized-ui/pop-overs/search"
 import CardSkeletonList from "@/components/customized-ui/skeletons /card-list"
 
 interface IRefererPostPageProps {}
+
 const RefererPostPageTemplate: React.FunctionComponent<
   IRefererPostPageProps
 > = () => {
@@ -37,13 +37,11 @@ const RefererPostPageTemplate: React.FunctionComponent<
 
   const { data, fetchNextPage, isLoading, isFetching } = result
 
-  const list = data
-    ? (data?.pages.flatMap((d) => d) as ISearchPostResponse[])
-    : []
+  const list = data !== undefined ? data.pages.flatMap((d) => d) : []
 
   return (
     <>
-      <div className="flex flex-row mt-8 gap-4 w-full h-full">
+      <div className="mt-8 flex h-full w-full flex-row gap-4">
         <Input onChange={handleCompanyChange} placeholder="公司名稱" />
         <SearchPopover
           provinceUuid={provinceUuid}
@@ -67,7 +65,7 @@ const RefererPostPageTemplate: React.FunctionComponent<
       </div>
 
       {!isLoading && !isFetching && list.length === 0 && (
-        <div className="p-4 rounded-lg text-center mt-8 border-2">
+        <div className="mt-8 rounded-lg border-2 p-4 text-center">
           冇資料🥲不如開個Post先？？
         </div>
       )}
@@ -85,7 +83,7 @@ const RefererPostPageTemplate: React.FunctionComponent<
             true
           }
         >
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4  w-full overflow-hidden mt-8">
+          <div className="mt-8 grid w-full grid-cols-1  gap-4 overflow-hidden sm:grid-cols-3">
             {list.map((data) => {
               return (
                 <ReferralCard

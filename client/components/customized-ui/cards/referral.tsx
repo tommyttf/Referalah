@@ -1,15 +1,22 @@
 import React, { useEffect, useState } from "react"
-
 import ContactDialog, {
   IContactDialogProps,
 } from "@/modules/referral/components/dialog/contact"
 import UserSignInDialog from "@/modules/referral/components/dialog/userSignIn"
 import ReferralCardDropDownMenu from "@/modules/referral/components/drop-down-menu/card"
 import compareDateDifferenceHelper from "@/utils/common/helpers/time/compareDateDifference"
-import BaseAvatar from "@/components/customized-ui/avatars/base"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
+
 import useUserStore from "@/hooks/state/user/store"
+import { Badge } from "@/components/ui/badge"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import BaseAvatar from "@/components/customized-ui/avatars/base"
 
 interface IReferralCardProps
   extends Omit<
@@ -61,11 +68,10 @@ const ReferralCard: React.FunctionComponent<IReferralCardProps> = ({
         oldDate: createdAt,
         unit: "day",
       })
-     
+
       if (difference === 0) {
         setDateDiffText("今日")
-      }
-      else if (difference > 0 && difference < 30) {
+      } else if (difference > 0 && difference < 30) {
         setDateDiffText(`${difference}日`)
       } else {
         setDateDiffText(`30日+`)
@@ -81,7 +87,7 @@ const ReferralCard: React.FunctionComponent<IReferralCardProps> = ({
     }
   }
   return (
-    <Card className="flex w-full h-500 md:h-[400px] flex-col justify-between border-2">
+    <Card className="h-500 flex w-full flex-col justify-between border-2 md:h-[400px]">
       <ContactDialog
         open={isContactFormOpen}
         username={username}
@@ -98,21 +104,22 @@ const ReferralCard: React.FunctionComponent<IReferralCardProps> = ({
       />
 
       <CardHeader className="justify-between">
-        <CardTitle className="flex  flex-row justify-between items-center w-full overflow-hidden">
+        <CardTitle className="flex  w-full flex-row items-center justify-between overflow-hidden">
           <span className="text-overflow-ellipsis">{jobTitle}</span>
-            
-            <ReferralCardDropDownMenu
+
+          <ReferralCardDropDownMenu
             url={socialMediaUrl}
             onContactClick={handleContactClick}
           />
-     
         </CardTitle>
-     
-        <CardDescription className="text-overflow-ellipsis">{companyName}</CardDescription>
+
+        <CardDescription className="text-overflow-ellipsis">
+          {companyName}
+        </CardDescription>
       </CardHeader>
 
-      <CardContent className="hidden h-full w-full md:flex flex-col md:flex-row">
-        <div className="flex flex-col items-center justify-start w-[35%]">
+      <CardContent className="hidden h-full w-full flex-col md:flex md:flex-row">
+        <div className="flex w-[35%] flex-col items-center justify-start">
           <BaseAvatar
             fallBack={username[0]}
             alt={username}
@@ -120,11 +127,11 @@ const ReferralCard: React.FunctionComponent<IReferralCardProps> = ({
             size="large"
           />
 
-          <p className="text-lg mt-12 font-semibold">{username}</p>
+          <p className="mt-12 text-lg font-semibold">{username}</p>
         </div>
 
         <div className=" h-[240px] w-[65%] text-center">
-          <div className="h-[240px] text-left inline-block break-words whitespace-pre-wrap overflow-y-auto">
+          <div className="inline-block h-[240px] overflow-y-auto whitespace-pre-wrap break-words text-left">
             {description}
           </div>
         </div>
@@ -142,23 +149,21 @@ const ReferralCard: React.FunctionComponent<IReferralCardProps> = ({
         </div>
 
         {dateDiffText && (
-          <p className="text-muted-foreground text-sm ">{dateDiffText}</p>
+          <p className="text-sm text-muted-foreground ">{dateDiffText}</p>
         )}
       </CardFooter>
 
       {/* for small screen */}
-      <CardContent className="flex h-full w-full md:hidden flex-col">
-
-      <div className="h-[200px] text-center">
-          <div className="h-[200px] text-left inline-block break-all whitespace-pre-wrap overflow-y-auto hyphens-auto">
+      <CardContent className="flex h-full w-full flex-col md:hidden">
+        <div className="h-[200px] text-center">
+          <div className="inline-block h-[200px] overflow-y-auto hyphens-auto whitespace-pre-wrap break-all text-left">
             {description}
           </div>
         </div>
-      
       </CardContent>
 
       <CardFooter className="flex flex-col md:hidden">
-        <div className="flex flex-row justify-center items-center w-full">
+        <div className="flex w-full flex-row items-center justify-center">
           <BaseAvatar
             fallBack={username[0]}
             alt={username}
@@ -167,7 +172,7 @@ const ReferralCard: React.FunctionComponent<IReferralCardProps> = ({
           <p>{username}</p>
         </div>
 
-        <div className="md:hidden flex flex-wrap gap-4 mt-2">
+        <div className="mt-2 flex flex-wrap gap-4 md:hidden">
           {country && <Badge variant="outline">{country}</Badge>}
           {province && <Badge variant="outline">{province}</Badge>}
           {city && <Badge variant="outline">{city}</Badge>}
@@ -179,7 +184,7 @@ const ReferralCard: React.FunctionComponent<IReferralCardProps> = ({
           )}
         </div>
         {dateDiffText && (
-          <p className="text-muted-foreground text-sm ">{dateDiffText}</p>
+          <p className="text-sm text-muted-foreground ">{dateDiffText}</p>
         )}
       </CardFooter>
     </Card>

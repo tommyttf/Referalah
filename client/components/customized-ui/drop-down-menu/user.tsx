@@ -1,20 +1,25 @@
-import BaseAvatar from "@/components/customized-ui/avatars/base"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { useToast } from "@/components/ui/use-toast"
+import React from "react"
+import Link from "next/link"
+import { supabase } from "@/utils/services/supabase/config"
+
 import { siteConfig } from "@/config/site"
 import useUserStore from "@/hooks/state/user/store"
-import { supabase } from "@/utils/services/supabase/config"
-import Link from "next/link"
-
-import React from "react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { useToast } from "@/components/ui/use-toast"
+import BaseAvatar from "@/components/customized-ui/avatars/base"
 
 const nav = [
-  { href:   siteConfig.page.profile.href, title: "用戶檔案" },
-  { href: siteConfig.page.referrer.href , title: "推薦人" },
-  { href:  siteConfig.page.referee.href, title: "受薦人" },
+  { href: siteConfig.page.profile.href, title: "用戶檔案" },
+  { href: siteConfig.page.referrer.href, title: "推薦人" },
+  { href: siteConfig.page.referee.href, title: "受薦人" },
   { href: siteConfig.page.createPost.href, title: "貼街招" },
   { href: siteConfig.page.referrerPost.href, title: "工搵人" },
-  { href:  siteConfig.page.refereePost.href, title: "人搵工" },
+  { href: siteConfig.page.refereePost.href, title: "人搵工" },
 ]
 
 const UserDropDownMenu = () => {
@@ -25,8 +30,8 @@ const UserDropDownMenu = () => {
     try {
       const { error } = await supabase.auth.signOut()
 
-      if(error) throw error
-      
+      if (error) throw error
+
       userState.reSetUser()
       toast({
         title: "登出成功！",
@@ -56,8 +61,7 @@ const UserDropDownMenu = () => {
             <DropdownMenuItem>
               <Link
                 href={n.href}
-               
-                className="flex items-center justify-center  space-x-2 w-full"
+                className="flex w-full items-center  justify-center space-x-2"
               >
                 {n.title}
               </Link>
@@ -66,7 +70,7 @@ const UserDropDownMenu = () => {
         })}
 
         <DropdownMenuItem
-          className="flex justify-center cursor-pointer"
+          className="flex cursor-pointer justify-center"
           onClick={handleSignOut}
         >
           登出

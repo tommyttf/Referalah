@@ -1,5 +1,6 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import React from "react"
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface IBaseAvatar {
   url?: string
@@ -14,7 +15,7 @@ const BaseAvatar: React.FunctionComponent<IBaseAvatar> = ({
   size,
 }) => {
   return (
-    <Avatar className={size === "large" ? "w-24 h-24 text-2xl" : ""}>
+    <Avatar className={size === "large" ? "h-24 w-24 text-2xl" : ""}>
       <AvatarImage src={url ? url : ""} alt={alt ? alt : ""} />
       <AvatarFallback>{fallBack}</AvatarFallback>
     </Avatar>

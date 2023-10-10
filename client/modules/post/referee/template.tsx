@@ -2,18 +2,16 @@
 
 import React from "react"
 
-import {ISearchPostResponse} from "@/types/api/response/referer-post"
-import {MessageType} from "@/types/common/message-type"
-import {ReferralType} from "@/types/common/referral-type"
+import { MessageType } from "@/types/common/message-type"
+import { ReferralType } from "@/types/common/referral-type"
 import useSearchPost from "@/hooks/api/post/search-post"
-import {Input} from "@/components/ui/input"
+import { Input } from "@/components/ui/input"
 import BaseInfiniteScroll from "@/components/customized-ui/Infinite-scroll/base"
 import ReferralCard from "@/components/customized-ui/cards/referral"
 import SearchPopover from "@/components/customized-ui/pop-overs/search"
 import CardSkeletonList from "@/components/customized-ui/skeletons /card-list"
 
-interface IRefereePostPageProps {
-}
+interface IRefereePostPageProps {}
 
 const RefereePostPageTemplate: React.FunctionComponent<
   IRefereePostPageProps
@@ -37,16 +35,14 @@ const RefereePostPageTemplate: React.FunctionComponent<
     sorting,
   } = useSearchPost(ReferralType.REFEREE)
 
-  const {data, fetchNextPage, isLoading, isFetching} = result
+  const { data, fetchNextPage, isLoading, isFetching } = result
 
-  const list = data
-    ? (data?.pages.flatMap((d) => d) as ISearchPostResponse[])
-    : []
+  const list = data !== undefined ? data.pages.flatMap((d) => d) : []
 
   return (
     <>
       <div className="mt-8 flex h-full w-full flex-row gap-4">
-        <Input onChange={handleCompanyChange} placeholder="公司名稱"/>
+        <Input onChange={handleCompanyChange} placeholder="公司名稱" />
         <SearchPopover
           provinceUuid={provinceUuid}
           countryUuid={countryUuid}
@@ -74,7 +70,7 @@ const RefereePostPageTemplate: React.FunctionComponent<
         </div>
       )}
 
-      {isLoading && <CardSkeletonList/>}
+      {isLoading && <CardSkeletonList />}
 
       {!isLoading && list.length > 0 && (
         <BaseInfiniteScroll

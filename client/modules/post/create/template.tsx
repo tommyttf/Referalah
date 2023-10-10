@@ -1,32 +1,31 @@
 "use client"
 
-import React, {useEffect, useState} from "react"
+import React, { useEffect, useState } from "react"
 import Link from "next/link"
-import {useRouter} from "next/navigation"
-import {maximumWordValidation} from "@/modules/profile/form/validation.ts/max-word"
-import {zodResolver} from "@hookform/resolvers/zod"
-import {useForm} from "react-hook-form"
-import {z} from "zod"
+import { useRouter } from "next/navigation"
+import { maximumWordValidation } from "@/modules/profile/form/validation.ts/max-word"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
 
-import {ReferralType} from "@/types/common/referral-type"
-import {siteConfig} from "@/config/site"
+import { ReferralType } from "@/types/common/referral-type"
+import { siteConfig } from "@/config/site"
 import useCreatePost from "@/hooks/api/post/create-post"
 import useCityOptions from "@/hooks/common/options/city-options"
 import useCountryOptions from "@/hooks/common/options/country-options"
 import useIndustryOptions from "@/hooks/common/options/industry-options"
 import useProvinceOptions from "@/hooks/common/options/province-pptions"
 import useUserStore from "@/hooks/state/user/store"
-import {Button} from "@/components/ui/button"
-import {Form} from "@/components/ui/form"
-import {ToastAction} from "@/components/ui/toast"
-import {useToast} from "@/components/ui/use-toast"
+import { Button } from "@/components/ui/button"
+import { Form } from "@/components/ui/form"
+import { ToastAction } from "@/components/ui/toast"
+import { useToast } from "@/components/ui/use-toast"
 import FormTextInput from "@/components/customized-ui/form/input"
 import FormNumberInput from "@/components/customized-ui/form/number"
 import FormSelect from "@/components/customized-ui/form/select"
 import FormTextArea from "@/components/customized-ui/form/text-area"
 
-interface ICreatePostTemplateProps {
-}
+interface ICreatePostTemplateProps {}
 
 const CreatePostTemplate: React.FunctionComponent<
   ICreatePostTemplateProps
@@ -104,7 +103,7 @@ const CreatePostTemplate: React.FunctionComponent<
       industryUuid: "",
     },
   })
-  const {toast} = useToast()
+  const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const countryWatch = form.watch("countryUuid")
   const provinceWatch = form.watch("provinceUuid")
@@ -118,7 +117,7 @@ const CreatePostTemplate: React.FunctionComponent<
   const countryOptions = useCountryOptions()
   const provinceOptions = useProvinceOptions(countryWatch)
   const cityOptions = useCityOptions(provinceWatch)
-  const {mutate: createPost, isLoading: isCreatePostLoading} = useCreatePost()
+  const { mutate: createPost, isLoading: isCreatePostLoading } = useCreatePost()
   const postTypeOptions = [
     {
       value: ReferralType.REFERRER,

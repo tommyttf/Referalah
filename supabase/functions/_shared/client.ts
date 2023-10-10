@@ -1,4 +1,4 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
+import {createClient} from 'https://esm.sh/@supabase/supabase-js@2'
 
 const initSupabaseClient = (req: any) => {
   return createClient(
@@ -10,10 +10,10 @@ const initSupabaseClient = (req: any) => {
     // This way your row-level-security (RLS) policies are applied.
 
     {
-      auth: { persistSession: false },
-      global: { headers: { Authorization: req.headers.get("Authorization")! } },
+      auth: {persistSession: false},
+      global: {headers: {Authorization: req.headers.get("Authorization")!}},
     }
   )
 }
 
-export { initSupabaseClient }
+export {initSupabaseClient}

@@ -11,3 +11,14 @@ export interface ICreatePostRequest {
   jobTitle: string
   description: string
 }
+
+export interface IFilterMeta {
+  companyName: any
+  cityUuid: string | undefined
+  countryUuid: string | undefined
+  industryUuid: string | undefined
+  provinceUuid: string | undefined
+  sorting: string
+  yoeMin: string | undefined
+  yoeMax: string | undefined
+}

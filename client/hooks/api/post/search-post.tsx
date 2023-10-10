@@ -1,5 +1,5 @@
 import { ChangeEvent, useState } from "react"
-import apiService from "@/utils/common/api"
+import { searchPost } from "@/utils/common/api"
 import { postSortingOptions } from "@/utils/common/sorting/post"
 import { useInfiniteQuery } from "@tanstack/react-query"
 
@@ -65,11 +65,11 @@ const useSearchPost = (type: ReferralType) => {
 
   const result = useInfiniteQuery({
     queryKey: [keyString, { sorting, filterMeta, type }],
-    queryFn: apiService.searchPost,
+    queryFn: searchPost,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
-    getNextPageParam: (lastPage, allPages: any[]) => {
-      if (lastPage && lastPage.length > 0) {
+    getNextPageParam: (lastPage, allPages) => {
+      if (Array.isArray(lastPage)) {
         return allPages.length
       } else {
         return null
